@@ -2,6 +2,7 @@
 #include <iostream>
 #include <optional>
 #include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -262,22 +263,51 @@ private:
 	Resources resources_;
 };
 
+struct RunOptions {
+	bool fullscreen;
+	unsigned screen_width;
+	unsigned screen_height;
+	unsigned cell_size;
+};
 
-int main(int argc, char** argv)
-{
+std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string window_size) {
+	const auto split_pos = window_size.find('x');
+	const auto width_str = window_size.substr(0, split_pos);
+	const auto height_str = window_size.substr(split_pos + 1);
+	return std::make_pair(std::stoul(width_str), std::stoul(height_str));
+}
+
+RunOptions parseOptions(int argc, char** argv) {
 	cxxopts::Options options("Conway's Game Of Life", "A world's famous cellular automata simulator");
 	options.add_options()
 		("f,fullscreen", "Run in fullscreen", cxxopts::value<bool>()->default_value("false"))
-		("w,window", "Window size", cxxopts::value<std::string>()->default_value("640x800"))
+		("w,window", "Window size", cxxopts::value<std::string>()->default_value("1280x800"))
 		("c,cell", "Grid cell size in pixels", cxxopts::value<unsigned>()->default_value("50"))
 		;
-	auto opt_result = options.parse(argc, argv);	// TODO: finish parsing logic
+	const auto opt_result = options.parse(argc, argv);
 
-	sf::RenderWindow window(sf::VideoMode(1280, 800), "Hello SFML World!");
+	RunOptions result{};
+	result.fullscreen = opt_result["fullscreen"].as<bool>();
+	std::tie(result.screen_width, result.screen_height) = getScreenDimensionsFromOption(opt_result["window"].as<std::string>());
+	result.cell_size = opt_result["cell"].as<unsigned>();
+
+	return result;
+}
+
+
+int main(int argc, char** argv)
+{
+	const auto opts = parseOptions(argc, argv);
+
+	sf::RenderWindow window(
+		sf::VideoMode(opts.screen_width, opts.screen_height),
+		"Conway's Game of Life",
+		(opts.fullscreen) ? sf::Style::Fullscreen : sf::Style::Default
+	);
 	window.setVerticalSyncEnabled(true);
 
 	const auto window_size = window.getSize();
-	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, 50);
+	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, opts.cell_size);
 	bool pause = true;
 
 	int update_after_milliseconds = 500;
