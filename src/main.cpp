@@ -125,6 +125,9 @@ public:
 	}
 
 	void render(sf::RenderWindow& window) {
+		if (is_hidden) {
+			return;
+		}
 		const sf::Vector2f upper_left{ static_cast<float>(offset_x_), static_cast<float>(offset_y_) };
 		resources_.alive_cell_sprite.setPosition(upper_left);
 		resources_.dead_cell_sprite.setPosition(upper_left);
@@ -158,6 +161,11 @@ public:
 
 	void handleResize(unsigned int new_width, unsigned int new_height, sf::RenderWindow& window) {
 		cell_size_ = static_cast<unsigned>(std::min(new_width / columns_, new_height / rows_));
+		if (cell_size_ == 0) {
+			is_hidden = true;
+			return;
+		}
+		is_hidden = false;
 		offset_x_ = (new_width - cell_size_ * static_cast<unsigned>(columns_)) / 2;
 		offset_y_ = (new_height - cell_size_ * static_cast<unsigned>(rows_)) / 2;
 		screen_width_ = new_width;
@@ -261,6 +269,8 @@ private:
 
 	Configuration config_;
 	Resources resources_;
+
+	bool is_hidden = false;
 };
 
 struct RunOptions {
