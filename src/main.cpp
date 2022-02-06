@@ -278,20 +278,31 @@ std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string window_s
 }
 
 RunOptions parseOptions(int argc, char** argv) {
-	cxxopts::Options options("Conway's Game Of Life", "A world's famous cellular automata simulator");
+	cxxopts::Options options("game_of_life", "Conway's Game of Life - cellular automata simulator");
 	options.add_options()
 		("f,fullscreen", "Run in fullscreen", cxxopts::value<bool>()->default_value("false"))
 		("w,window", "Window size", cxxopts::value<std::string>()->default_value("1280x800"))
 		("c,cell", "Grid cell size in pixels", cxxopts::value<unsigned>()->default_value("50"))
-		;
-	const auto opt_result = options.parse(argc, argv);
+		("help", "Print application usage")
+	;
+	try {
+		const auto opts_result = options.parse(argc, argv);
+		if (opts_result.count("help")) {
+			std::cout << options.help() << '\n';
+			std::exit(0);
+		}
 
-	RunOptions result{};
-	result.fullscreen = opt_result["fullscreen"].as<bool>();
-	std::tie(result.screen_width, result.screen_height) = getScreenDimensionsFromOption(opt_result["window"].as<std::string>());
-	result.cell_size = opt_result["cell"].as<unsigned>();
+		RunOptions result{};
+		result.fullscreen = opts_result["fullscreen"].as<bool>();
+		std::tie(result.screen_width, result.screen_height) = getScreenDimensionsFromOption(opts_result["window"].as<std::string>());
+		result.cell_size = opts_result["cell"].as<unsigned>();
 
-	return result;
+		return result;
+	}
+	catch (cxxopts::OptionParseException& e) {
+		std::cout << "Error: " << e.what();
+		std::exit(1);
+	}
 }
 
 
