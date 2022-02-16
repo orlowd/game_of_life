@@ -1,4 +1,5 @@
 ﻿#include <cassert>
+#include <cstdlib>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -299,7 +300,7 @@ RunOptions parseOptions(int argc, char** argv) {
 		const auto opts_result = options.parse(argc, argv);
 		if (opts_result.count("help")) {
 			std::cout << options.help() << '\n';
-			std::exit(0);
+			std::exit(EXIT_SUCCESS);
 		}
 
 		RunOptions result{};
@@ -311,7 +312,7 @@ RunOptions parseOptions(int argc, char** argv) {
 	}
 	catch (const cxxopts::OptionParseException& e) {
 		std::cout << "Error: " << e.what();
-		std::exit(1);
+		std::exit(EXIT_FAILURE);
 	}
 }
 
@@ -390,5 +391,5 @@ int main(int argc, char** argv)
 		window.display();
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
