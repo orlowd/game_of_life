@@ -309,7 +309,7 @@ RunOptions parseOptions(int argc, char** argv) {
 
 		return result;
 	}
-	catch (cxxopts::OptionParseException& e) {
+	catch (const cxxopts::OptionParseException& e) {
 		std::cout << "Error: " << e.what();
 		std::exit(1);
 	}
