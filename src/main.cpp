@@ -1,5 +1,6 @@
 ﻿#include <cassert>
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <optional>
 #include <string>
@@ -217,7 +218,7 @@ private:
 	void resetGridTexture() {
 		resources_.grid_image = createCellBordersImage(cell_size_);
 		if (!resources_.grid_texture.create(cell_size_, cell_size_)) {
-			std::cout << "ERROR: could not create grid texture\n";		// should rather throw
+			throw std::runtime_error("could not create grid texture");
 		}
 		resources_.grid_texture.update(resources_.grid_image);
 	}
@@ -241,7 +242,7 @@ private:
 
 		resources_.cell_image = createSquareImage(1, sf::Color::White);
 		if (!resources_.cell_texture.create(1, 1)) {
-			std::cout << "ERROR: could not create cell texture\n";		// should rather throw
+			throw std::runtime_error("could not create cell texture");
 		}
 		resources_.cell_texture.update(resources_.cell_image);
 
