@@ -9,6 +9,8 @@
 
 #include <cxxopts.hpp>
 #include <SFML/Graphics.hpp>
+#include <imgui.h>
+#include <imgui-SFML.h>
 
 
 struct Position {
@@ -327,6 +329,7 @@ int main(int argc, char** argv)
 		(opts.fullscreen) ? sf::Style::Fullscreen : sf::Style::Default
 	);
 	window.setVerticalSyncEnabled(true);
+	ImGui::SFML::Init(window);
 
 	const auto window_size = window.getSize();
 	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, opts.cell_size);
@@ -342,6 +345,7 @@ int main(int argc, char** argv)
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
+			ImGui::SFML::ProcessEvent(window, event);
 			if (event.type == sf::Event::Closed || 
 				event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
 				window.close();
@@ -378,6 +382,14 @@ int main(int argc, char** argv)
 			}
 		}
 
+		ImGui::SFML::Update(window, clock.getElapsedTime());
+
+		ImGui::Begin("Menu");
+		if (ImGui::Button("Exit")) {
+			window.close();
+		}
+		ImGui::End();
+
 		elapsed_time += clock.restart().asMilliseconds();
 		if (elapsed_time >= update_after_milliseconds) {
 			elapsed_time = 0;
@@ -388,8 +400,11 @@ int main(int argc, char** argv)
 
 		window.clear();
 		game.render(window);
+		ImGui::SFML::Render(window);
 		window.display();
 	}
+
+	ImGui::SFML::Shutdown();
 
 	return EXIT_SUCCESS;
 }
