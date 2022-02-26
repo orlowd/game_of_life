@@ -335,6 +335,7 @@ int main(int argc, char** argv)
 	const auto window_size = window.getSize();
 	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, opts.cell_size);
 	bool pause = true;
+	bool menu_open = true;
 
 	int update_after_milliseconds = 500;
 	const int max_update_ms = 4000;
@@ -347,11 +348,13 @@ int main(int argc, char** argv)
 		sf::Event event;
 		while (window.pollEvent(event)) {
 			ImGui::SFML::ProcessEvent(window, event);
-			if (event.type == sf::Event::Closed || 
-				event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+			if (event.type == sf::Event::Closed) {
 				window.close();
 			}
-			else if (event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+				menu_open = !menu_open;
+			}
+			else if (!menu_open && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
 				game.handleClick({ static_cast<unsigned>(event.mouseButton.x), static_cast<unsigned>(event.mouseButton.y) });
 			}
 			else if (event.type == sf::Event::KeyPressed) {
@@ -385,11 +388,19 @@ int main(int argc, char** argv)
 
 		ImGui::SFML::Update(window, clock.getElapsedTime());
 
-		ImGui::Begin("Menu");
-		if (ImGui::Button("Exit")) {
-			window.close();
+		if (menu_open) {
+			ImGui::Begin("Menu", &menu_open);
+			if (ImGui::Button("Hide Menu")) {
+				menu_open = false;
+			}
+			else if (ImGui::Button("Pause")) {
+				pause = !pause;
+			}
+			else if (ImGui::Button("Exit")) {
+				window.close();
+			}
+			ImGui::End();
 		}
-		ImGui::End();
 
 		elapsed_time += clock.restart().asMilliseconds();
 		if (elapsed_time >= update_after_milliseconds) {
