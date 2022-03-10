@@ -157,7 +157,7 @@ int main(int argc, char** argv)
 		ImGui::SFML::Update(window, clock.getElapsedTime());
 
 		if (menu_open) {
-			ImGui::Begin("Menu", &menu_open);
+			ImGui::Begin("Menu", &menu_open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
 			if (ImGui::Button("Hide Menu")) {
 				menu_open = false;
 			}
