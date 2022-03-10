@@ -82,6 +82,21 @@ public:
 	void handleClick(Position click_pos);
 	void handleResize(unsigned int new_width, unsigned int new_height, sf::RenderWindow& window);
 
+	void setGridColor(sf::Color new_color) {
+		resources_.grid_sprite.setColor(new_color);
+	}
+	void setAliveCellColor(sf::Color new_color) {
+		resources_.alive_cell_sprite.setColor(new_color);
+	}
+	void setDeadCellColor(sf::Color new_color) {
+		resources_.dead_cell_sprite.setColor(new_color);
+	}
+	void setBackgroundColor(sf::Color new_color);
+	void setSimulationSpeed(sf::Color new_color);
+
+	inline const static sf::Color default_grid_color{ 128, 128, 128 };
+	inline const static sf::Color default_alive_cells_color{ sf::Color::White };
+	inline const static sf::Color default_dead_cells_color{ sf::Color::Black };
 private:
 	struct Configuration {
 		sf::Color grid_color{ sf::Color::White };

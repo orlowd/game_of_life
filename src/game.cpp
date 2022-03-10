@@ -127,7 +127,7 @@ void GameOfLife::initializeResources() {
 	resources_.grid_texture.setSmooth(true);
 	resources_.grid_texture.setRepeated(true);
 	resources_.grid_sprite.setTexture(resources_.grid_texture);
-	resources_.grid_sprite.setColor(sf::Color{ 128, 128, 128 });
+	resources_.grid_sprite.setColor(default_grid_color);
 
 	resources_.cell_image = createSquareImage(1, sf::Color::White);
 	if (!resources_.cell_texture.create(1, 1)) {
@@ -138,8 +138,8 @@ void GameOfLife::initializeResources() {
 	resources_.alive_cell_sprite.setTexture(resources_.cell_texture);
 	resources_.dead_cell_sprite.setTexture(resources_.cell_texture);
 
-	resources_.alive_cell_sprite.setColor(sf::Color::White);
-	resources_.dead_cell_sprite.setColor(sf::Color::Black);
+	resources_.alive_cell_sprite.setColor(default_alive_cells_color);
+	resources_.dead_cell_sprite.setColor(default_dead_cells_color);
 
 	resetGridTexture();
 	updateGridSprite();

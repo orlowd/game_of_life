@@ -1,4 +1,5 @@
-﻿#include <cassert>
+﻿#include <array>
+#include <cassert>
 #include <cstdlib>
 #include <exception>
 #include <iostream>
@@ -58,6 +59,28 @@ RunOptions parseOptions(int argc, char** argv) {
 	}
 }
 
+struct RGBColor {
+	float red;
+	float green;
+	float blue;
+
+	static RGBColor fromSfColor(sf::Color color) {
+		return {
+			color.r / 255.f,
+			color.g / 255.f,
+			color.b / 255.f
+		};
+	}
+
+	sf::Color toSfColor() const {
+		return {
+			static_cast<sf::Uint8>(red * 255),
+			static_cast<sf::Uint8>(green * 255),
+			static_cast<sf::Uint8>(blue * 255)
+		};
+	}
+};
+
 
 int main(int argc, char** argv)
 {
@@ -80,6 +103,12 @@ int main(int argc, char** argv)
 	const int max_update_ms = 4000;
 	const int min_update_ms = 100;
 	const int update_delta_ms = 100;
+
+	std::array<RGBColor, 3> elements_colors{
+		RGBColor::fromSfColor(GameOfLife::default_grid_color),
+		RGBColor::fromSfColor(GameOfLife::default_alive_cells_color),
+		RGBColor::fromSfColor(GameOfLife::default_dead_cells_color)
+	};
 
 	int elapsed_time = 0;
 	sf::Clock clock;
@@ -132,12 +161,28 @@ int main(int argc, char** argv)
 			if (ImGui::Button("Hide Menu")) {
 				menu_open = false;
 			}
-			else if (ImGui::Button("Pause")) {
+			else if (ImGui::Button(pause ? "Continue" : "Pause")) {
 				pause = !pause;
 			}
 			else if (ImGui::Button("Exit")) {
 				window.close();
 			}
+			if (ImGui::TreeNode("Colors")) {
+				if (ImGui::ColorEdit3("Grid Color", &elements_colors[0].red)) {
+					game.setGridColor(elements_colors[0].toSfColor());
+				}
+				if (ImGui::ColorEdit3("Alive Cells Color", &elements_colors[1].red)) {
+					game.setAliveCellColor(elements_colors[1].toSfColor());
+				}
+				if (ImGui::ColorEdit3("Dead Cells Color", &elements_colors[2].red)) {
+					game.setDeadCellColor(elements_colors[2].toSfColor());
+				}
+				float background_color[3];
+				ImGui::ColorEdit3("Background Color", background_color);
+				ImGui::TreePop();
+			}
+			float speed{};
+			ImGui::SliderFloat("Speed", &speed, 0., 1., "%.3f", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::End();
 		}
 
