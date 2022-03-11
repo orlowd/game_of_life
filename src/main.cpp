@@ -157,7 +157,13 @@ int main(int argc, char** argv)
 		ImGui::SFML::Update(window, clock.getElapsedTime());
 
 		if (menu_open) {
-			ImGui::Begin("Menu", &menu_open, ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize);
+			constexpr static ImGuiWindowFlags window_flags =
+				ImGuiWindowFlags_NoResize |
+				ImGuiWindowFlags_NoMove |
+				ImGuiWindowFlags_NoSavedSettings;
+			const auto cur_window_size = window.getSize();
+			ImGui::SetNextWindowPos(ImVec2(cur_window_size.x / 2, cur_window_size.y / 2));
+			ImGui::Begin("Menu", &menu_open, window_flags);
 			if (ImGui::Button("Hide Menu")) {
 				menu_open = false;
 			}
