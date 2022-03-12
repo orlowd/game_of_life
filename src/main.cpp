@@ -160,17 +160,20 @@ int main(int argc, char** argv)
 			constexpr static ImGuiWindowFlags window_flags =
 				ImGuiWindowFlags_NoResize |
 				ImGuiWindowFlags_NoMove |
+				ImGuiWindowFlags_NoCollapse |
 				ImGuiWindowFlags_NoSavedSettings;
-			const auto cur_window_size = window.getSize();
-			ImGui::SetNextWindowPos(ImVec2(cur_window_size.x / 2, cur_window_size.y / 2));
+			ImGui::SetNextWindowSize(ImVec2{ 480, 400 });
+			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+			ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
 			ImGui::Begin("Menu", &menu_open, window_flags);
-			if (ImGui::Button("Hide Menu")) {
+			const ImVec2 button_width = { ImGui::GetContentRegionAvail().x, 0 };
+			if (ImGui::Button("Hide Menu", button_width)) {
 				menu_open = false;
 			}
-			else if (ImGui::Button(pause ? "Continue" : "Pause")) {
+			if (ImGui::Button(pause ? "Continue##pause" : "Pause##pause", button_width)) {
 				pause = !pause;
 			}
-			else if (ImGui::Button("Exit")) {
+			if (ImGui::Button("Exit", button_width)) {
 				window.close();
 			}
 			if (ImGui::TreeNode("Colors")) {
