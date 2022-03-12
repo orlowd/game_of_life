@@ -60,25 +60,42 @@ RunOptions parseOptions(int argc, char** argv) {
 }
 
 struct RGBColor {
-	float red;
-	float green;
-	float blue;
+	RGBColor(float red, float green, float blue) :
+		data_{ red, green, blue } {}
+	
+	RGBColor(sf::Color color) :
+		data_{ color.r / 255.f, color.g / 255.f, color.b / 255.f } {}
 
-	static RGBColor fromSfColor(sf::Color color) {
-		return {
-			color.r / 255.f,
-			color.g / 255.f,
-			color.b / 255.f
-		};
+	float red() const {
+		return data_[RED];
+	}
+	float green() const {
+		return data_[GREEN];
+	}
+	float blue() const {
+		return data_[BLUE];
+	}
+
+	float* data() {
+		return data_.data();
 	}
 
 	sf::Color toSfColor() const {
 		return {
-			static_cast<sf::Uint8>(red * 255),
-			static_cast<sf::Uint8>(green * 255),
-			static_cast<sf::Uint8>(blue * 255)
+			static_cast<sf::Uint8>(red() * 255),
+			static_cast<sf::Uint8>(green() * 255),
+			static_cast<sf::Uint8>(blue() * 255)
 		};
 	}
+
+private:
+	std::array<float, 3> data_{};
+
+	enum ColorChannel {
+		RED = 0,
+		GREEN = 1,
+		BLUE = 2
+	};
 };
 
 
@@ -89,7 +106,7 @@ int main(int argc, char** argv)
 	sf::RenderWindow window(
 		sf::VideoMode(opts.screen_width, opts.screen_height),
 		"Conway's Game of Life",
-		(opts.fullscreen) ? sf::Style::Fullscreen : sf::Style::Default
+		opts.fullscreen ? sf::Style::Fullscreen : sf::Style::Default
 	);
 	window.setVerticalSyncEnabled(true);
 	ImGui::SFML::Init(window);
@@ -99,15 +116,16 @@ int main(int argc, char** argv)
 	bool pause = true;
 	bool menu_open = true;
 
-	int update_after_milliseconds = 500;
-	const int max_update_ms = 4000;
-	const int min_update_ms = 100;
+	int step_delta_ms = 500;
+	constexpr static int max_update_ms = 4000;
+	constexpr static int min_update_ms = 100;
 	const int update_delta_ms = 100;
 
-	std::array<RGBColor, 3> elements_colors{
-		RGBColor::fromSfColor(GameOfLife::default_grid_color),
-		RGBColor::fromSfColor(GameOfLife::default_alive_cells_color),
-		RGBColor::fromSfColor(GameOfLife::default_dead_cells_color)
+	std::array<RGBColor, 4> elements_colors{
+		GameOfLife::default_grid_color,
+		GameOfLife::default_alive_cells_color,
+		GameOfLife::default_dead_cells_color,
+		sf::Color::Black
 	};
 
 	int elapsed_time = 0;
@@ -131,16 +149,16 @@ int main(int argc, char** argv)
 					std::cout << "pause = " << pause << '\n';
 				}
 				else if (event.key.code == sf::Keyboard::Left) {
-					if (update_after_milliseconds < max_update_ms) {
-						update_after_milliseconds += update_delta_ms;
+					if (step_delta_ms < max_update_ms) {
+						step_delta_ms += update_delta_ms;
 					}
-					std::cout << "update_after_milliseconds = " << update_after_milliseconds << '\n';
+					std::cout << "update_after_milliseconds = " << step_delta_ms << '\n';
 				}
 				else if (event.key.code == sf::Keyboard::Right) {
-					if (update_after_milliseconds > min_update_ms) {
-						update_after_milliseconds -= update_delta_ms;
+					if (step_delta_ms > min_update_ms) {
+						step_delta_ms -= update_delta_ms;
 					}
-					std::cout << "update_after_milliseconds = " << update_after_milliseconds << '\n';
+					std::cout << "update_after_milliseconds = " << step_delta_ms << '\n';
 				}
 			}
 			else if (event.type == sf::Event::Resized) {
@@ -150,7 +168,6 @@ int main(int argc, char** argv)
 					static_cast<float>(event.size.height)
 				}));
 				game.handleResize(event.size.width, event.size.height, window);
-				window.clear(sf::Color::Black);
 			}
 		}
 
@@ -162,7 +179,7 @@ int main(int argc, char** argv)
 				ImGuiWindowFlags_NoMove |
 				ImGuiWindowFlags_NoCollapse |
 				ImGuiWindowFlags_NoSavedSettings;
-			ImGui::SetNextWindowSize(ImVec2{ 480, 400 });
+			ImGui::SetNextWindowSize(ImVec2{ 450, 240 });
 			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 			ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
 			ImGui::Begin("Menu", &menu_open, window_flags);
@@ -177,33 +194,31 @@ int main(int argc, char** argv)
 				window.close();
 			}
 			if (ImGui::TreeNode("Colors")) {
-				if (ImGui::ColorEdit3("Grid Color", &elements_colors[0].red)) {
+				if (ImGui::ColorEdit3("Grid", elements_colors[0].data())) {
 					game.setGridColor(elements_colors[0].toSfColor());
 				}
-				if (ImGui::ColorEdit3("Alive Cells Color", &elements_colors[1].red)) {
+				if (ImGui::ColorEdit3("Alive Cells", elements_colors[1].data())) {
 					game.setAliveCellColor(elements_colors[1].toSfColor());
 				}
-				if (ImGui::ColorEdit3("Dead Cells Color", &elements_colors[2].red)) {
+				if (ImGui::ColorEdit3("Dead Cells", elements_colors[2].data())) {
 					game.setDeadCellColor(elements_colors[2].toSfColor());
 				}
-				float background_color[3];
-				ImGui::ColorEdit3("Background Color", background_color);
+				ImGui::ColorEdit3("Background", elements_colors[3].data());
 				ImGui::TreePop();
 			}
-			float speed{};
-			ImGui::SliderFloat("Speed", &speed, 0., 1., "%.3f", ImGuiSliderFlags_AlwaysClamp);
+			ImGui::SliderInt("Step Delay (ms)", &step_delta_ms, 1, 10'000, "%d", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::End();
 		}
 
 		elapsed_time += clock.restart().asMilliseconds();
-		if (elapsed_time >= update_after_milliseconds) {
+		if (elapsed_time >= step_delta_ms) {
 			elapsed_time = 0;
 			if (!pause) {
 				game.runStep();
 			}
 		}
 
-		window.clear();
+		window.clear(elements_colors[3].toSfColor());
 		game.render(window);
 		ImGui::SFML::Render(window);
 		window.display();

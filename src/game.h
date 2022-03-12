@@ -91,8 +91,6 @@ public:
 	void setDeadCellColor(sf::Color new_color) {
 		resources_.dead_cell_sprite.setColor(new_color);
 	}
-	void setBackgroundColor(sf::Color new_color);
-	void setSimulationSpeed(sf::Color new_color);
 
 	inline const static sf::Color default_grid_color{ 128, 128, 128 };
 	inline const static sf::Color default_alive_cells_color{ sf::Color::White };
