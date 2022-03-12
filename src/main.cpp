@@ -193,6 +193,7 @@ int main(int argc, char** argv)
 			if (ImGui::Button("Exit", button_width)) {
 				window.close();
 			}
+			ImGui::Separator();
 			if (ImGui::TreeNode("Colors")) {
 				if (ImGui::ColorEdit3("Grid", elements_colors[0].data())) {
 					game.setGridColor(elements_colors[0].toSfColor());
