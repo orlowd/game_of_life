@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 				ImGuiWindowFlags_NoMove |
 				ImGuiWindowFlags_NoCollapse |
 				ImGuiWindowFlags_NoSavedSettings;
-			ImGui::SetNextWindowSize(ImVec2{ 450, 240 });
+			ImGui::SetNextWindowSize(ImVec2{ 400, 240 });
 			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 			ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
 			ImGui::Begin("Menu", &menu_open, window_flags);
@@ -194,19 +194,19 @@ int main(int argc, char** argv)
 				window.close();
 			}
 			ImGui::Separator();
-			if (ImGui::TreeNode("Colors")) {
-				if (ImGui::ColorEdit3("Grid", elements_colors[0].data())) {
-					game.setGridColor(elements_colors[0].toSfColor());
-				}
-				if (ImGui::ColorEdit3("Alive Cells", elements_colors[1].data())) {
-					game.setAliveCellColor(elements_colors[1].toSfColor());
-				}
-				if (ImGui::ColorEdit3("Dead Cells", elements_colors[2].data())) {
-					game.setDeadCellColor(elements_colors[2].toSfColor());
-				}
-				ImGui::ColorEdit3("Background", elements_colors[3].data());
-				ImGui::TreePop();
+			ImGui::TextUnformatted("Colors:");
+			ImGui::Indent();
+			if (ImGui::ColorEdit3("Grid", elements_colors[0].data())) {
+				game.setGridColor(elements_colors[0].toSfColor());
 			}
+			if (ImGui::ColorEdit3("Alive Cells", elements_colors[1].data())) {
+				game.setAliveCellColor(elements_colors[1].toSfColor());
+			}
+			if (ImGui::ColorEdit3("Dead Cells", elements_colors[2].data())) {
+				game.setDeadCellColor(elements_colors[2].toSfColor());
+			}
+			ImGui::ColorEdit3("Background", elements_colors[3].data());
+			ImGui::Unindent();
 			ImGui::SliderInt("Step Delay (ms)", &step_delta_ms, 1, 10'000, "%d", ImGuiSliderFlags_AlwaysClamp);
 			ImGui::End();
 		}
