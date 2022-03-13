@@ -60,23 +60,27 @@ RunOptions parseOptions(int argc, char** argv) {
 }
 
 struct RGBColor {
-	RGBColor(float red, float green, float blue) :
+	constexpr RGBColor(float red, float green, float blue) :
 		data_{ red, green, blue } {}
 	
 	RGBColor(sf::Color color) :
 		data_{ color.r / 255.f, color.g / 255.f, color.b / 255.f } {}
 
-	float red() const {
+	constexpr float red() const {
 		return data_[RED];
 	}
-	float green() const {
+	constexpr float green() const {
 		return data_[GREEN];
 	}
-	float blue() const {
+	constexpr float blue() const {
 		return data_[BLUE];
 	}
 
-	float* data() {
+	constexpr float* data() {
+		return data_.data();
+	}
+
+	constexpr const float* data() const {
 		return data_.data();
 	}
 
@@ -89,7 +93,7 @@ struct RGBColor {
 	}
 
 private:
-	std::array<float, 3> data_{};
+	std::array<float, 3> data_;
 
 	enum ColorChannel {
 		RED = 0,
