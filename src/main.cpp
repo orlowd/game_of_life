@@ -186,7 +186,7 @@ int main(int argc, char** argv)
 			ImGui::SetNextWindowSize(ImVec2{ 400, 240 });
 			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
 			ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
-			ImGui::Begin("Menu", &menu_open, window_flags);
+			ImGui::Begin(pause ? "Menu - Paused" : "Menu - Running", &menu_open, window_flags);
 			const ImVec2 button_width = { ImGui::GetContentRegionAvail().x, 0 };
 			if (ImGui::Button("Hide Menu", button_width)) {
 				menu_open = false;
