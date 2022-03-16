@@ -102,6 +102,103 @@ private:
 	};
 };
 
+struct Settings {
+	bool paused{ true };
+	bool in_menu{ true };
+	int step_delta_ms{ 400 };
+	RGBColor grid_color{ GameOfLife::default_grid_color };
+	RGBColor alive_color{ GameOfLife::default_alive_cells_color };
+	RGBColor dead_color{ GameOfLife::default_dead_cells_color };
+	RGBColor background_color{ sf::Color::Black };
+
+	void increaseSpeed() {
+		if (step_delta_ms <= max_update_ms - update_delta_ms) {
+			step_delta_ms += update_delta_ms;
+		}
+	}
+
+	void decreaseSpeed() {
+		if (step_delta_ms >= min_update_ms + update_delta_ms) {
+			step_delta_ms -= update_delta_ms;
+		}
+	}
+
+	constexpr static int max_update_ms = 10'000;
+	constexpr static int min_update_ms = 1;
+	constexpr static int update_delta_ms = 100;
+};
+
+void handleEvent(sf::RenderWindow& window, sf::Event& event, GameOfLife& game, Settings& settings) {
+	ImGui::SFML::ProcessEvent(window, event);
+	if (event.type == sf::Event::Closed) {
+		window.close();
+	}
+	else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
+		settings.in_menu = !settings.in_menu;
+	}
+	else if (!settings.in_menu && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
+		game.handleClick({ static_cast<unsigned>(event.mouseButton.x), static_cast<unsigned>(event.mouseButton.y) });
+	}
+	else if (event.type == sf::Event::KeyPressed) {
+		if (event.key.code == sf::Keyboard::Enter) {
+			settings.paused = !settings.paused;
+		}
+		else if (event.key.code == sf::Keyboard::Left) {
+			settings.increaseSpeed();
+		}
+		else if (event.key.code == sf::Keyboard::Right) {
+			settings.decreaseSpeed();
+		}
+	}
+	else if (event.type == sf::Event::Resized) {
+		window.setView(sf::View(sf::FloatRect{
+			0.f, 0.f,
+			static_cast<float>(event.size.width),
+			static_cast<float>(event.size.height)
+			}));
+		game.handleResize(event.size.width, event.size.height, window);
+	}
+}
+
+void drawMenu(sf::RenderWindow& window, GameOfLife& game, Settings& settings) {
+	constexpr static ImGuiWindowFlags window_flags =
+		ImGuiWindowFlags_NoResize |
+		ImGuiWindowFlags_NoMove |
+		ImGuiWindowFlags_NoCollapse |
+		ImGuiWindowFlags_NoSavedSettings;
+	ImGui::SetNextWindowSize(ImVec2{ 400, 240 });
+	const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+	ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
+	ImGui::Begin(settings.paused ? "Menu - Paused" : "Menu - Running", &settings.in_menu, window_flags);
+	const ImVec2 button_width = { ImGui::GetContentRegionAvail().x, 0 };
+	if (ImGui::Button("Hide Menu", button_width)) {
+		settings.in_menu = false;
+	}
+	if (ImGui::Button(settings.paused ? "Continue##pause" : "Pause##pause", button_width)) {
+		settings.paused = !settings.paused;
+	}
+	if (ImGui::Button("Exit", button_width)) {
+		window.close();
+	}
+	ImGui::Separator();
+	ImGui::TextUnformatted("Colors:");
+	ImGui::Indent();
+	if (ImGui::ColorEdit3("Grid", settings.grid_color.data())) {
+		game.setGridColor(settings.grid_color.toSfColor());
+	}
+	if (ImGui::ColorEdit3("Alive Cells", settings.alive_color.data())) {
+		game.setAliveCellColor(settings.alive_color.toSfColor());
+	}
+	if (ImGui::ColorEdit3("Dead Cells", settings.dead_color.data())) {
+		game.setDeadCellColor(settings.dead_color.toSfColor());
+	}
+	ImGui::ColorEdit3("Background", settings.background_color.data());
+	ImGui::Unindent();
+	ImGui::SliderInt("Step Delay (ms)", &settings.step_delta_ms,
+		Settings::min_update_ms, Settings::max_update_ms,
+		"%d", ImGuiSliderFlags_AlwaysClamp);
+	ImGui::End();
+}
 
 int main(int argc, char** argv)
 {
@@ -117,113 +214,31 @@ int main(int argc, char** argv)
 
 	const auto window_size = window.getSize();
 	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, opts.cell_size);
-	bool pause = true;
-	bool menu_open = true;
-
-	int step_delta_ms = 500;
-	constexpr static int max_update_ms = 4000;
-	constexpr static int min_update_ms = 100;
-	const int update_delta_ms = 100;
-
-	std::array<RGBColor, 4> elements_colors{
-		GameOfLife::default_grid_color,
-		GameOfLife::default_alive_cells_color,
-		GameOfLife::default_dead_cells_color,
-		sf::Color::Black
-	};
+	Settings settings;
 
 	int elapsed_time = 0;
 	sf::Clock clock;
 	while (window.isOpen()) {
 		sf::Event event;
 		while (window.pollEvent(event)) {
-			ImGui::SFML::ProcessEvent(window, event);
-			if (event.type == sf::Event::Closed) {
-				window.close();
-			}
-			else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-				menu_open = !menu_open;
-			}
-			else if (!menu_open && event.type == sf::Event::MouseButtonPressed && event.mouseButton.button == sf::Mouse::Left) {
-				game.handleClick({ static_cast<unsigned>(event.mouseButton.x), static_cast<unsigned>(event.mouseButton.y) });
-			}
-			else if (event.type == sf::Event::KeyPressed) {
-				if (event.key.code == sf::Keyboard::Enter) {
-					pause = !pause;
-					std::cout << "pause = " << pause << '\n';
-				}
-				else if (event.key.code == sf::Keyboard::Left) {
-					if (step_delta_ms < max_update_ms) {
-						step_delta_ms += update_delta_ms;
-					}
-					std::cout << "update_after_milliseconds = " << step_delta_ms << '\n';
-				}
-				else if (event.key.code == sf::Keyboard::Right) {
-					if (step_delta_ms > min_update_ms) {
-						step_delta_ms -= update_delta_ms;
-					}
-					std::cout << "update_after_milliseconds = " << step_delta_ms << '\n';
-				}
-			}
-			else if (event.type == sf::Event::Resized) {
-				window.setView(sf::View(sf::FloatRect{ 
-					0.f, 0.f,
-					static_cast<float>(event.size.width),
-					static_cast<float>(event.size.height)
-				}));
-				game.handleResize(event.size.width, event.size.height, window);
-			}
+			handleEvent(window, event, game, settings);
 		}
 
 		ImGui::SFML::Update(window, clock.getElapsedTime());
 
-		if (menu_open) {
-			constexpr static ImGuiWindowFlags window_flags =
-				ImGuiWindowFlags_NoResize |
-				ImGuiWindowFlags_NoMove |
-				ImGuiWindowFlags_NoCollapse |
-				ImGuiWindowFlags_NoSavedSettings;
-			ImGui::SetNextWindowSize(ImVec2{ 400, 240 });
-			const ImVec2 center = ImGui::GetMainViewport()->GetCenter();
-			ImGui::SetNextWindowPos(center, ImGuiCond_None, ImVec2{ 0.5f, 0.5f });
-			ImGui::Begin(pause ? "Menu - Paused" : "Menu - Running", &menu_open, window_flags);
-			const ImVec2 button_width = { ImGui::GetContentRegionAvail().x, 0 };
-			if (ImGui::Button("Hide Menu", button_width)) {
-				menu_open = false;
-			}
-			if (ImGui::Button(pause ? "Continue##pause" : "Pause##pause", button_width)) {
-				pause = !pause;
-			}
-			if (ImGui::Button("Exit", button_width)) {
-				window.close();
-			}
-			ImGui::Separator();
-			ImGui::TextUnformatted("Colors:");
-			ImGui::Indent();
-			if (ImGui::ColorEdit3("Grid", elements_colors[0].data())) {
-				game.setGridColor(elements_colors[0].toSfColor());
-			}
-			if (ImGui::ColorEdit3("Alive Cells", elements_colors[1].data())) {
-				game.setAliveCellColor(elements_colors[1].toSfColor());
-			}
-			if (ImGui::ColorEdit3("Dead Cells", elements_colors[2].data())) {
-				game.setDeadCellColor(elements_colors[2].toSfColor());
-			}
-			ImGui::ColorEdit3("Background", elements_colors[3].data());
-			ImGui::Unindent();
-			ImGui::SliderInt("Step Delay (ms)", &step_delta_ms, 1, 10'000, "%d", ImGuiSliderFlags_AlwaysClamp);
-			ImGui::End();
+		if (settings.in_menu) {
+			drawMenu(window, game, settings);
 		}
 
 		elapsed_time += clock.restart().asMilliseconds();
-		if (elapsed_time >= step_delta_ms) {
+		if (elapsed_time >= settings.step_delta_ms) {
 			elapsed_time = 0;
-			if (!pause) {
+			if (!settings.paused) {
 				game.runStep();
 			}
 		}
 
-		window.clear(elements_colors[3].toSfColor());
+		window.clear(settings.background_color.toSfColor());
 		game.render(window);
 		ImGui::SFML::Render(window);
 		window.display();
