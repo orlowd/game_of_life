@@ -1,6 +1,5 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
-
 #include "utility.h"
 
 void handleEvent(sf::RenderWindow& window, sf::Event& event, GameOfLife& game, Settings& settings) {
@@ -105,4 +104,21 @@ void runGameLoop(sf::RenderWindow& window, GameOfLife& game) {
 		ImGui::SFML::Render(window);
 		window.display();
 	}
+}
+
+void runGame(RunOptions options) {
+	sf::RenderWindow window(
+		sf::VideoMode(options.screen_width, options.screen_height),
+		"Conway's Game of Life",
+		options.fullscreen ? sf::Style::Fullscreen : sf::Style::Default
+	);
+	window.setVerticalSyncEnabled(true);
+	ImGui::SFML::Init(window);
+
+	const auto window_size = window.getSize();
+	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, options.cell_size);
+
+	runGameLoop(window, game);
+
+	ImGui::SFML::Shutdown();
 }

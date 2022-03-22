@@ -4,9 +4,7 @@
 #include <cstdlib>
 #include <optional>
 #include <vector>
-
 #include <SFML/Graphics.hpp>
-
 
 struct Position {
 	unsigned x;

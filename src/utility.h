@@ -1,10 +1,9 @@
 #pragma once
 
 #include <array>
-
 #include <SFML/Graphics.hpp>
-
 #include "game.h"
+#include "options.h"
 
 struct RGBColor {
 	constexpr RGBColor(float red, float green, float blue) :
@@ -78,3 +77,4 @@ struct Settings {
 void handleEvent(sf::RenderWindow& window, sf::Event& event, GameOfLife& game, Settings& settings);
 void drawMenu(sf::RenderWindow& window, GameOfLife& game, Settings& settings);
 void runGameLoop(sf::RenderWindow& window, GameOfLife& game);
+void runGame(RunOptions options);

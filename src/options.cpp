@@ -1,8 +1,6 @@
 #include <cstdlib>
 #include <tuple>
-
 #include <cxxopts.hpp>
-
 #include "options.h"
 
 std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string window_size) {

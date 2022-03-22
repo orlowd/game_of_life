@@ -1,7 +1,5 @@
 #include <exception>
-
 #include "game.h"
-
 
 bool Grid::checkCell(Index ind) const {
 	unsigned sum = 0;
@@ -20,7 +18,6 @@ bool Grid::checkCell(Index ind) const {
 	}
 	return false;
 }
-
 
 sf::Image createCellBordersImage(unsigned cell_size, sf::Color color)
 {
@@ -43,7 +40,6 @@ sf::Image createSquareImage(unsigned size, sf::Color color)
 	image.create(size, size, color);
 	return image;
 }
-
 
 void GameOfLife::runStep() {
 	for (std::size_t i = 0; i < rows_; i++) {
