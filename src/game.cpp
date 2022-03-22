@@ -1,3 +1,5 @@
+#include <exception>
+
 #include "game.h"
 
 

@@ -1,6 +1,4 @@
-﻿cmake_minimum_required (VERSION 3.21)
-
-add_executable(game_of_life "main.cpp" "game.cpp" "game.h")
+﻿add_executable(game_of_life "main.cpp" "game.cpp" "game.h" "options.h" "options.cpp" "utility.h" "utility.cpp")
 
 find_package(SFML COMPONENTS system window graphics CONFIG REQUIRED)
 target_link_libraries(game_of_life PRIVATE sfml-system sfml-network sfml-graphics sfml-window)
