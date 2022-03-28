@@ -49,10 +49,10 @@ public:
 
 	Index getPeriodicIndex(int row, int col) const {
 		if (row < 0) {
-			row = static_cast<int>(rows() + row);
+			row = static_cast<int>(rows() - (-row) % rows());
 		}
 		if (col < 0) {
-			col = static_cast<int>(columns() + col);
+			col = static_cast<int>(columns() - (-col) % columns());
 		}
 		return { .row = row % rows(), .col = col % columns() };
 	}
