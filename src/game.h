@@ -22,7 +22,7 @@ struct Cell {
 
 class Grid {
 public:
-	Grid(std::size_t columns, std::size_t rows)
+	Grid(std::size_t rows, std::size_t columns)
 		: grid_{ rows, std::vector(columns, Cell{false}) }
 	{
 		assert(columns > 0 && rows > 0);
