@@ -1,4 +1,4 @@
-add_executable(test_gol "test_main.cpp" "test_grid.cpp")
+add_executable(test_gol "test_main.cpp" "test_grid.cpp" "test_options.cpp")
 target_link_libraries(test_gol PRIVATE common)
 
 find_package(Catch2 CONFIG REQUIRED)
