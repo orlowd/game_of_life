@@ -1,0 +1,11 @@
+{
+    "name": "game-of-life",
+    "version-string": "0.1.0",
+    "dependencies": [
+        "sfml",
+        "imgui",
+        "imgui-sfml",
+        "cxxopts",
+        "catch2"
+    ]
+}
