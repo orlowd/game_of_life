@@ -1,10 +1,10 @@
-﻿cmake_minimum_required (VERSION 3.21)
+﻿cmake_minimum_required(VERSION 3.21)
+
+project("game_of_life" CXX)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-project ("game_of_life")
 
 add_subdirectory("src")
 add_subdirectory("test")
