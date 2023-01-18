@@ -69,7 +69,7 @@ class GameOfLife {
 public:
 	GameOfLife(Position upper_left, unsigned screen_width, unsigned screen_height, unsigned cell_size)
 		: start_pos_{ upper_left }, screen_width_{ screen_width }, screen_height_{ screen_height }, cell_size_{ cell_size },
-		columns_{ screen_width / cell_size }, rows_{ screen_height / cell_size }, grid_{ columns_, rows_ }, buffer_{ grid_ },
+		columns_{ screen_width / cell_size }, rows_{ screen_height / cell_size }, grid_{ rows_, columns_ }, buffer_{ grid_ },
 		offset_x_{ (screen_width - cell_size * static_cast<unsigned>(columns_)) / 2 },
 		offset_y_{ (screen_height - cell_size * static_cast<unsigned>(rows_)) / 2 }
 	{
