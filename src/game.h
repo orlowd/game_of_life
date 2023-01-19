@@ -96,12 +96,6 @@ public:
 	inline const static sf::Color default_alive_cells_color{ 255, 255, 255 };
 	inline const static sf::Color default_dead_cells_color{ 0, 0, 0 };
 private:
-	struct Configuration {
-		sf::Color grid_color{ sf::Color::White };
-		sf::Color alive_color{ sf::Color::White };
-		sf::Color dead_color{ sf::Color::Black };
-		unsigned speed{ 1u };
-	};
 	struct Resources {
 		sf::Image grid_image;
 		sf::Texture grid_texture;
@@ -149,7 +143,6 @@ private:
 	Grid grid_;
 	Grid buffer_;
 
-	Configuration config_;
 	Resources resources_;
 
 	bool is_hidden = false;
