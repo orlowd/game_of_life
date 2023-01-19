@@ -117,6 +117,9 @@ void runGame(RunOptions options) {
         throw std::runtime_error("could not initialize ImGUI-SFML window");
     }
 
+    // Disable ImGui automatic state saving
+    ImGui::GetIO().IniFilename = nullptr;
+
 	const auto window_size = window.getSize();
 	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, options.cell_size);
 
