@@ -113,7 +113,9 @@ void runGame(RunOptions options) {
 		options.fullscreen ? sf::Style::Fullscreen : sf::Style::Default
 	);
 	window.setVerticalSyncEnabled(true);
-	ImGui::SFML::Init(window);
+	if (!ImGui::SFML::Init(window)) {
+        throw std::runtime_error("could not initialize ImGUI-SFML window");
+    }
 
 	const auto window_size = window.getSize();
 	auto game = GameOfLife({ 0, 0 }, window_size.x, window_size.y, options.cell_size);
