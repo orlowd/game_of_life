@@ -2,12 +2,14 @@
 #include "catch.hpp"
 #include "../src/options.h"
 
+using namespace std::literals;
+
 TEST_CASE("Screen resolution options are correctly parsed", "[options]") {
 	{
-		const std::string in1{ "1920x1080" };
-		const auto res = getScreenDimensionsFromOption(in1);
-		REQUIRE(res.first == 1920);
-		REQUIRE(res.second == 1080);
+		const auto in = "1920x1080"sv;
+		const auto [width, height] = getScreenDimensionsFromOption(in);
+		REQUIRE(width == 1920);
+		REQUIRE(height == 1080);
 	}
 }
 

@@ -4,8 +4,11 @@
 bool Grid::checkCell(Index ind) const {
 	unsigned sum = 0;
 
-	for (int i = static_cast<int>(ind.row) - 1; i <= static_cast<int>(ind.row) + 1; i++) {
-		for (int j = static_cast<int>(ind.col) - 1; j <= static_cast<int>(ind.col) + 1; j++) {
+    const auto row = static_cast<int>(ind.row);
+    const auto col = static_cast<int>(ind.col);
+
+	for (int i = row - 1; i <= row + 1; i++) {
+		for (int j = col - 1; j <= col + 1; j++) {
 			sum += at(getPeriodicIndex(i, j)).data;
 		}
 	}
@@ -16,13 +19,14 @@ bool Grid::checkCell(Index ind) const {
 	else if (sum == 4) {
 		return at(ind).data;
 	}
+
 	return false;
 }
 
-sf::Image createCellBordersImage(unsigned cell_size, sf::Color color)
-{
+sf::Image createCellBordersImage(unsigned cell_size, sf::Color color) {
 	sf::Image image;
 	image.create(cell_size, cell_size, sf::Color::Transparent);
+
 	for (unsigned x = 0; x < cell_size; x++) {
 		image.setPixel(x, 0, color);
 		image.setPixel(x, cell_size - 1, color);
@@ -31,11 +35,11 @@ sf::Image createCellBordersImage(unsigned cell_size, sf::Color color)
 		image.setPixel(0, y, color);
 		image.setPixel(cell_size - 1, y, color);
 	}
+
 	return image;
 }
 
-sf::Image createSquareImage(unsigned size, sf::Color color)
-{
+sf::Image createSquareImage(unsigned size, sf::Color color) {
 	sf::Image image;
 	image.create(size, size, color);
 	return image;
@@ -44,7 +48,8 @@ sf::Image createSquareImage(unsigned size, sf::Color color)
 void GameOfLife::runStep() {
 	for (std::size_t i = 0; i < rows_; i++) {
 		for (std::size_t j = 0; j < columns_; j++) {
-			buffer_.at(Index{ i, j }) = { grid_.checkCell(Index{ i, j }) };
+            const auto idx = Index{i, j};
+			buffer_.at(idx) = { grid_.checkCell(idx) };
 		}
 	}
 	grid_ = buffer_;
@@ -54,35 +59,40 @@ void GameOfLife::render(sf::RenderWindow& window) {
 	if (is_hidden) {
 		return;
 	}
-	const sf::Vector2f upper_left{ static_cast<float>(offset_x_), static_cast<float>(offset_y_) };
+
+	const auto upper_left = sf::Vector2f(
+        static_cast<float>(offset_x_),
+        static_cast<float>(offset_y_)
+    );
 	resources_.alive_cell_sprite.setPosition(upper_left);
 	resources_.dead_cell_sprite.setPosition(upper_left);
+
 	for (std::size_t i = 0; i < rows_; i++) {
 		for (std::size_t j = 0; j < columns_; j++) {
-			if (grid_.at({ i, j }).data == true) {
-				resources_.alive_cell_sprite.setPosition(
-					upper_left + sf::Vector2f{ static_cast<float>(j * cell_size_ + 1), static_cast<float>(i * cell_size_ + 1) }
-				);
+            const auto cur_pos = upper_left + sf::Vector2f{
+                static_cast<float>(j * cell_size_ + 1),
+                static_cast<float>(i * cell_size_ + 1)
+            };
+
+			if (grid_.at({ i, j }).data) {
+				resources_.alive_cell_sprite.setPosition(cur_pos);
 				window.draw(resources_.alive_cell_sprite);
 			}
 			else {
-				resources_.dead_cell_sprite.setPosition(
-					upper_left + sf::Vector2f{ static_cast<float>(j * cell_size_ + 1), static_cast<float>(i * cell_size_ + 1) }
-				);
+				resources_.dead_cell_sprite.setPosition(cur_pos);
 				window.draw(resources_.dead_cell_sprite);
 			}
 		}
 	}
+
 	window.draw(resources_.grid_sprite);
 }
 
 void GameOfLife::handleClick(Position click_pos) {
-	auto cell = getIndexFromPositionOnScreen(click_pos);
-	if (!cell) {
-		return;
+	if (auto cell = getIndexFromPositionOnScreen(click_pos); cell) {
+        auto& cell_value = grid_.at(*cell);
+        cell_value.data = !cell_value.data;
 	}
-	auto& cell_value = grid_.at(*cell);
-	cell_value.data = !cell_value.data;
 }
 
 void GameOfLife::handleResize(unsigned int new_width, unsigned int new_height, sf::RenderWindow& window) {
@@ -91,6 +101,7 @@ void GameOfLife::handleResize(unsigned int new_width, unsigned int new_height, s
 		is_hidden = true;
 		return;
 	}
+
 	is_hidden = false;
 	offset_x_ = (new_width - cell_size_ * static_cast<unsigned>(columns_)) / 2;
 	offset_y_ = (new_height - cell_size_ * static_cast<unsigned>(rows_)) / 2;
@@ -111,21 +122,29 @@ void GameOfLife::resetGridTexture() {
 }
 
 void GameOfLife::updateGridSprite() {
-	resources_.grid_sprite.setTextureRect(sf::IntRect{ 0, 0, static_cast<int>(screen_width_ - 2 * offset_x_), static_cast<int>(screen_height_ - 2 * offset_y_) });
-	const sf::Vector2f upper_left{ static_cast<float>(offset_x_), static_cast<float>(offset_y_) };
+	resources_.grid_sprite.setTextureRect({
+        0, 0,
+        static_cast<int>(screen_width_ - 2 * offset_x_),
+        static_cast<int>(screen_height_ - 2 * offset_y_)
+    });
+	const auto upper_left = sf::Vector2f(
+        static_cast<float>(offset_x_),
+        static_cast<float>(offset_y_)
+    );
 	resources_.grid_sprite.setPosition(upper_left);
 }
 
 void GameOfLife::updateCellsScale() {
-	resources_.alive_cell_sprite.setScale(static_cast<float>(cell_size_ - 2), static_cast<float>(cell_size_ - 2));
-	resources_.dead_cell_sprite.setScale(static_cast<float>(cell_size_ - 2), static_cast<float>(cell_size_ - 2));
+    const auto factor = static_cast<float>(cell_size_ - 2);
+	resources_.alive_cell_sprite.setScale(factor, factor);
+	resources_.dead_cell_sprite.setScale(factor, factor);
 }
 
 void GameOfLife::initializeResources() {
 	resources_.grid_texture.setSmooth(true);
 	resources_.grid_texture.setRepeated(true);
 	resources_.grid_sprite.setTexture(resources_.grid_texture);
-	resources_.grid_sprite.setColor(default_grid_color);
+	resources_.grid_sprite.setColor(default_grid);
 
 	resources_.cell_image = createSquareImage(1, sf::Color::White);
 	if (!resources_.cell_texture.create(1, 1)) {
@@ -136,8 +155,8 @@ void GameOfLife::initializeResources() {
 	resources_.alive_cell_sprite.setTexture(resources_.cell_texture);
 	resources_.dead_cell_sprite.setTexture(resources_.cell_texture);
 
-	resources_.alive_cell_sprite.setColor(default_alive_cells_color);
-	resources_.dead_cell_sprite.setColor(default_dead_cells_color);
+	resources_.alive_cell_sprite.setColor(default_alive);
+	resources_.dead_cell_sprite.setColor(default_dead);
 
 	resetGridTexture();
 	updateGridSprite();

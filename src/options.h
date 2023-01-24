@@ -10,6 +10,6 @@ struct RunOptions {
 	unsigned cell_size;
 };
 
-std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string window_size);
+std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string_view window_size);
 
 RunOptions parseOptions(int argc, char** argv);

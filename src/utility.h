@@ -49,13 +49,13 @@ private:
 };
 
 struct Settings {
-	bool paused{ true };
-	bool in_menu{ true };
-	int step_delta_ms{ 400 };
-	RGBColor grid_color{ GameOfLife::default_grid_color };
-	RGBColor alive_color{ GameOfLife::default_alive_cells_color };
-	RGBColor dead_color{ GameOfLife::default_dead_cells_color };
-	RGBColor background_color{ sf::Color::Black };
+	bool paused = true;
+	bool in_menu = true;
+	int step_delta_ms = 400;
+	RGBColor grid_color = { GameOfLife::default_grid };
+	RGBColor alive_color = { GameOfLife::default_alive };
+	RGBColor dead_color = { GameOfLife::default_dead };
+	RGBColor background_color = { sf::Color::Black };
 
 	void increaseSpeed() {
 		if (step_delta_ms <= max_update_ms - update_delta_ms) {
@@ -69,9 +69,9 @@ struct Settings {
 		}
 	}
 
-	constexpr static int max_update_ms = 10'000;
-	constexpr static int min_update_ms = 1;
-	constexpr static int update_delta_ms = 100;
+	static constexpr int max_update_ms = 10'000;
+	static constexpr int min_update_ms = 1;
+	static constexpr int update_delta_ms = 100;
 };
 
 void handleEvent(sf::RenderWindow& window, sf::Event& event, GameOfLife& game, Settings& settings);

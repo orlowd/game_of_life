@@ -68,10 +68,11 @@ sf::Image createSquareImage(unsigned size, sf::Color color = sf::Color::White);
 class GameOfLife {
 public:
 	GameOfLife(Position upper_left, unsigned screen_width, unsigned screen_height, unsigned cell_size)
-		: start_pos_{ upper_left }, screen_width_{ screen_width }, screen_height_{ screen_height }, cell_size_{ cell_size },
-		columns_{ screen_width / cell_size }, rows_{ screen_height / cell_size }, grid_{ rows_, columns_ }, buffer_{ grid_ },
-		offset_x_{ (screen_width - cell_size * static_cast<unsigned>(columns_)) / 2 },
-		offset_y_{ (screen_height - cell_size * static_cast<unsigned>(rows_)) / 2 }
+		: start_pos_{ upper_left }, screen_width_{ screen_width }, screen_height_{ screen_height },
+          cell_size_{ cell_size }, columns_{ screen_width / cell_size }, rows_{ screen_height / cell_size },
+          grid_{ rows_, columns_ }, buffer_{ grid_ },
+		  offset_x_{ (screen_width - cell_size * static_cast<unsigned>(columns_)) / 2 },
+		  offset_y_{ (screen_height - cell_size * static_cast<unsigned>(rows_)) / 2 }
 	{
 		initializeResources();
 	}
@@ -92,9 +93,9 @@ public:
 		resources_.dead_cell_sprite.setColor(new_color);
 	}
 
-	inline const static sf::Color default_grid_color{ 128, 128, 128 };
-	inline const static sf::Color default_alive_cells_color{ 255, 255, 255 };
-	inline const static sf::Color default_dead_cells_color{ 0, 0, 0 };
+	inline static const auto default_grid = sf::Color{128, 128, 128 };
+	inline static const auto default_alive = sf::Color{255, 255, 255 };
+	inline static const auto default_dead = sf::Color{0, 0, 0 };
 private:
 	struct Resources {
 		sf::Image grid_image;
