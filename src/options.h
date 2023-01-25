@@ -4,10 +4,10 @@
 #include <utility>
 
 struct RunOptions {
-	bool fullscreen;
-	unsigned screen_width;
-	unsigned screen_height;
-	unsigned cell_size;
+    bool fullscreen;
+    unsigned screen_width;
+    unsigned screen_height;
+    unsigned cell_size;
 };
 
 std::pair<unsigned, unsigned> getScreenDimensionsFromOption(std::string_view window_size);
