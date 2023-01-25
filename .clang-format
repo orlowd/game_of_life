@@ -1,0 +1,36 @@
+BasedOnStyle: llvm
+
+AccessModifierOffset: -4
+AlignOperands: Align
+AlignEscapedNewlines: Right
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: All
+AllowShortLambdasOnASingleLine: All
+AlwaysBreakTemplateDeclarations: Yes
+BinPackArguments: false
+BinPackParameters: false
+BreakConstructorInitializers: BeforeComma
+BreakBeforeBinaryOperators: All
+BreakBeforeBraces: Custom
+BraceWrapping:
+  BeforeElse: false
+  BeforeCatch: false
+  BeforeLambdaBody: false
+ColumnLimit: 90
+PackConstructorInitializers: CurrentLine
+IndentWidth: 4
+LambdaBodyIndentation: Signature
+NamespaceIndentation: None
+PenaltyBreakAssignment: 60
+PenaltyBreakBeforeFirstCallParameter: 175
+PointerAlignment: Left
+ReferenceAlignment: Left
+QualifierAlignment: Custom
+QualifierOrder: ['inline', 'static', 'const', 'volatile', 'type']
+SortIncludes: CaseInsensitive
+SortUsingDeclarations: true
+SpaceAfterCStyleCast: true
+SpaceAfterTemplateKeyword: true
+SpacesBeforeTrailingComments: 2
+SpacesInSquareBrackets: false
