@@ -1,0 +1,12 @@
+Checks:	>
+  readability-*,
+  clang-diagnostic-*,
+  clang-analyzer-*,
+  -modernize-use-nodiscard,
+  -readability-uppercase-literal-suffix,
+  -readability-magic-numbers,
+  -readability-else-after-return,
+  -readability-identifier-length
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+FormatStyle: google
